@@ -1,9 +1,7 @@
 import { createServer } from 'node:http'
-import { createPost } from './services/post-service.js'
+import { createPost, listPosts } from './services/post-service.js'
 
 const { API_PORT, API_HOST, API_PROTOCOL } = process.env
-
-const posts = []
 
 const server = createServer((request, response) => {
     const { method, url } = request
@@ -12,8 +10,18 @@ const server = createServer((request, response) => {
 
     //posts
     if (method === 'GET' && path === '/posts') {
-        response.writeHead(200, { 'Content-Type': 'application/json' })
-	    return response.end(JSON.stringify({ data: posts }))
+        listPosts()
+            .then((posts) => {
+                response.writeHead(200, { 'Content-Type': 'application/json' })
+                response.end(JSON.stringify({ data: posts }))
+            })
+            .catch((error) => {
+                console.error('Erro ao buscar posts:', error)
+                response.writeHead(500, { 'Content-Type': 'application/json' })
+                response.end(JSON.stringify({ message: 'Não foi possível buscar os posts' }))
+            })
+
+        return
     }
 
     if (method === 'POST' && path === '/posts/draft') {
@@ -32,7 +40,6 @@ const server = createServer((request, response) => {
                 }
 
                 const post = await createPost(body.idea.trim())
-                posts.push(post)
 
                 response.writeHead(201, { 'Content-Type': 'application/json' })
                 return response.end(JSON.stringify({
@@ -61,6 +68,6 @@ const server = createServer((request, response) => {
 })
 
 server.listen(API_PORT, API_HOST, () => {
-	console.log(`Servidor disponível em ${API_PROTOCOL}://${API_HOST}:${API_PORT}`)
-    console.log("Pressione CTRL+C para parar o servidor")
+    console.log(`Servidor disponível em ${API_PROTOCOL}://${API_HOST}:${API_PORT}`)
+    console.log('Pressione CTRL+C para parar o servidor')
 })

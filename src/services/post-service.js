@@ -1,6 +1,9 @@
 import { nanoid } from 'nanoid'
 import { mastra } from '../mastra/index.js'
 import { ID, postSchema } from '../mastra/agents/post-agent.js'
+import * as postRepository from '../repositories/post-repository.js'
+
+export const listPosts = () => postRepository.findAll()
 
 export async function createPost(idea) {
     const agent = mastra.getAgentById(ID)
@@ -9,7 +12,7 @@ export async function createPost(idea) {
         { structuredOutput: { schema: postSchema } },
     )
 
-    return {
+    const post = {
         id: nanoid(),
         title: generatedPost.object.title,
         content: generatedPost.object.content,
@@ -18,4 +21,6 @@ export async function createPost(idea) {
         approved_at: null,
         rejected_at: null,
     }
+
+    return postRepository.create(post)
 }
