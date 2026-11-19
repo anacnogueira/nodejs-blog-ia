@@ -1,4 +1,5 @@
 import { createServer } from 'node:http'
+import { createPost } from './services/post-service.js'
 
 const { API_PORT, API_HOST, API_PROTOCOL } = process.env
 
@@ -14,8 +15,43 @@ const server = createServer((request, response) => {
         response.writeHead(200, { 'Content-Type': 'application/json' })
 	    return response.end(JSON.stringify({ data: posts }))
     }
-    if (method === 'POST' && path === '/posts') {
-        return
+
+    if (method === 'POST' && path === '/posts/draft') {
+        const bodyBuffer = []
+
+        request.on('data', (chunk) => bodyBuffer.push(chunk))
+
+        request.on('end', async () => {
+            try {
+                const bodyString = Buffer.concat(bodyBuffer).toString()
+                const body = JSON.parse(bodyString)
+
+                if (typeof body?.idea !== 'string' || !body.idea.trim()) {
+                    response.writeHead(400, { 'Content-Type': 'application/json' })
+                    return response.end(JSON.stringify({ message: 'O campo idea é obrigatório' }))
+                }
+
+                const post = await createPost(body.idea.trim())
+                posts.push(post)
+
+                response.writeHead(201, { 'Content-Type': 'application/json' })
+                return response.end(JSON.stringify({
+                    message: 'Rascunho criado com sucesso',
+                    data: post,
+                }))
+            } catch (error) {
+                if (error instanceof SyntaxError) {
+                    response.writeHead(400, { 'Content-Type': 'application/json' })
+                    return response.end(JSON.stringify({ message: 'Dados inválidos' }))
+                }
+
+                console.error('Erro ao criar rascunho:', error)
+                response.writeHead(500, { 'Content-Type': 'application/json' })
+                return response.end(JSON.stringify({ message: 'Não foi possível gerar o post' }))
+            }
+        })
+
+        return;
     }
 
     response.writeHead(404, { 'Content-Type': 'application/json' })
