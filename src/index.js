@@ -42,10 +42,12 @@ const server = createServer((request, response) => {
                 const post = await createPost(body.idea.trim())
 
                 response.writeHead(201, { 'Content-Type': 'application/json' })
-                return response.end(JSON.stringify({
-                    message: 'Rascunho criado com sucesso',
-                    data: post,
-                }))
+                return response.end(
+                    JSON.stringify({
+                        message: 'Rascunho criado com sucesso',
+                        data: post,
+                    }),
+                )
             } catch (error) {
                 if (error instanceof SyntaxError) {
                     response.writeHead(400, { 'Content-Type': 'application/json' })
@@ -58,13 +60,11 @@ const server = createServer((request, response) => {
             }
         })
 
-        return;
+        return
     }
 
     response.writeHead(404, { 'Content-Type': 'application/json' })
-    return response.end(JSON.stringify({ message: "Não encontrado" }))
-
-	
+    return response.end(JSON.stringify({ message: 'Não encontrado' }))
 })
 
 server.listen(API_PORT, API_HOST, () => {

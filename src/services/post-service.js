@@ -7,10 +7,9 @@ export const listPosts = () => postRepository.findAll()
 
 export async function createPost(idea) {
     const agent = mastra.getAgentById(ID)
-    const generatedPost = await agent.generate(
-        `Crie um post completo para esta ideia: ${idea}`,
-        { structuredOutput: { schema: postSchema } },
-    )
+    const generatedPost = await agent.generate(`Crie um post completo para esta ideia: ${idea}`, {
+        structuredOutput: { schema: postSchema },
+    })
 
     const post = {
         id: nanoid(),
