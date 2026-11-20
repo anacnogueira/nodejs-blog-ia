@@ -1,5 +1,5 @@
 import { createServer } from 'node:http'
-import { createPost, listPosts } from './services/post-service.js'
+import { createPost, getPostById, listPosts } from './services/post-service.js'
 
 const { API_PORT, API_HOST, API_PROTOCOL } = process.env
 
@@ -8,7 +8,6 @@ const server = createServer((request, response) => {
     const paths = url.split('?').filter(Boolean)
     const path = paths[0] || '/'
 
-    //posts
     if (method === 'GET' && path === '/posts') {
         listPosts()
             .then((posts) => {
@@ -19,6 +18,27 @@ const server = createServer((request, response) => {
                 console.error('Erro ao buscar posts:', error)
                 response.writeHead(500, { 'Content-Type': 'application/json' })
                 response.end(JSON.stringify({ message: 'Não foi possível buscar os posts' }))
+            })
+
+        return
+    }
+
+    const postByIdMatch = path.match(/^\/posts\/([^/]+)$/)
+    if (method === 'GET' && postByIdMatch) {
+        getPostById(postByIdMatch[1])
+            .then((post) => {
+                if (!post) {
+                    response.writeHead(404, { 'Content-Type': 'application/json' })
+                    return response.end(JSON.stringify({ message: 'Post não encontrado' }))
+                }
+
+                response.writeHead(200, { 'Content-Type': 'application/json' })
+                return response.end(JSON.stringify({ data: post }))
+            })
+            .catch((error) => {
+                console.error('Erro ao buscar post:', error)
+                response.writeHead(500, { 'Content-Type': 'application/json' })
+                response.end(JSON.stringify({ message: 'Não foi possível buscar o post' }))
             })
 
         return

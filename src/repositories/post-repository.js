@@ -10,6 +10,17 @@ export async function findAll() {
     return result.rows
 }
 
+export async function findById(id) {
+    const result = await pool.query(
+        `SELECT id, title, content, published_at, created_at, approved_at, rejected_at
+         FROM posts
+         WHERE id = $1`,
+        [id],
+    )
+
+    return result.rows[0] ?? null
+}
+
 export async function create(post) {
     const result = await pool.query(
         `INSERT INTO posts (id, title, content, published_at, created_at, approved_at, rejected_at)
