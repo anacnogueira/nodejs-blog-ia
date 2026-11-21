@@ -1,4 +1,4 @@
-import { createPost, getPostById, listPosts } from '../services/post-service.js'
+import { approvePost, createPost, getPostById, listPosts } from '../services/post-service.js'
 
 function sendJson(response, statusCode, body) {
     response.writeHead(statusCode, { 'Content-Type': 'application/json' })
@@ -57,6 +57,24 @@ export function registerPostRoutes(router) {
 
             console.error('Erro ao criar rascunho:', error)
             sendJson(response, 500, { message: 'Não foi possível gerar o post' })
+        }
+    })
+
+    router.patch('/posts/:id/approve', async (request, response) => {
+        try {
+            const post = await approvePost(request.params.id)
+            if (!post) {
+                sendJson(response, 404, { message: 'Post não encontrado' })
+                return
+            }
+
+            sendJson(response, 200, {
+                message: 'Post aprovado com sucesso',
+                data: post,
+            })
+        } catch (error) {
+            console.error('Erro ao aprovar post:', error)
+            sendJson(response, 500, { message: 'Não foi possível aprovar o post' })
         }
     })
 }

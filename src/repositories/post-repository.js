@@ -39,3 +39,15 @@ export async function create(post) {
 
     return result.rows[0]
 }
+
+export async function approve(id, approvedAt) {
+    const result = await pool.query(
+        `UPDATE posts
+         SET approved_at = $2, published_at = $2
+         WHERE id = $1
+         RETURNING id, title, content, published_at, created_at, approved_at, rejected_at`,
+        [id, approvedAt],
+    )
+
+    return result.rows[0] ?? null
+}

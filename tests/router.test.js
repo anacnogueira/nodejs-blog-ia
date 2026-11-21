@@ -45,3 +45,21 @@ test('returns JSON 404 when no route matches', async () => {
     assert.equal(response.statusCode, 404)
     assert.deepEqual(JSON.parse(response.body), { message: 'Não encontrado' })
 })
+
+test('matches a PATCH route and exposes path params', async () => {
+    const router = createRouter()
+    let receivedRequest
+
+    router.patch('/posts/:id/approve', async (request, response) => {
+        receivedRequest = request
+        response.writeHead(200)
+        response.end('approved')
+    })
+
+    const response = createResponse()
+    await router.handle({ method: 'PATCH', url: '/posts/post-123/approve' }, response)
+
+    assert.deepEqual(receivedRequest.params, { id: 'post-123' })
+    assert.equal(response.statusCode, 200)
+    assert.equal(response.body, 'approved')
+})

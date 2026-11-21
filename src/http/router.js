@@ -87,6 +87,7 @@ export function createRouter() {
     return {
         get: (path, handler) => register('GET', path, handler),
         post: (path, handler) => register('POST', path, handler),
+        patch: (path, handler) => register('PATCH', path, handler),
         handle,
     }
 }
