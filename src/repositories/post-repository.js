@@ -1,9 +1,10 @@
 import { pool } from '../database/postgres.js'
 
-export async function findAll() {
+export async function findAll(includeAll = false) {
     const result = await pool.query(
         `SELECT id, title, content, published_at, created_at, approved_at, rejected_at
          FROM posts
+         ${includeAll ? '' : 'WHERE published_at IS NOT NULL'}
          ORDER BY published_at DESC`,
     )
 

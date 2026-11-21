@@ -12,9 +12,26 @@ function sendJson(response, statusCode, body) {
 }
 
 export function registerPostRoutes(router) {
-    router.get('/posts', async (_request, response) => {
+    router.get('/posts', async (request, response) => {
         try {
-            const posts = await listPosts()
+            const url = new URL(request.url, 'http://localhost')
+            const includeAll = url.searchParams.get('include') === 'all'
+
+            if (includeAll) {
+                const authorization = request.headers?.authorization
+                const apiKey = process.env.API_KEY
+                const isValidApiKey =
+                    typeof apiKey === 'string' &&
+                    typeof authorization === 'string' &&
+                    authorization === `Bearer ${apiKey}`
+
+                if (!isValidApiKey) {
+                    sendJson(response, 403, { message: 'Acesso negado' })
+                    return
+                }
+            }
+
+            const posts = await listPosts(includeAll)
             sendJson(response, 200, { data: posts })
         } catch (error) {
             console.error('Erro ao buscar posts:', error)

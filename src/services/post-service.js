@@ -3,7 +3,7 @@ import { mastra } from '../mastra/index.js'
 import { ID, postSchema } from '../mastra/agents/post-agent.js'
 import * as postRepository from '../repositories/post-repository.js'
 
-export const listPosts = () => postRepository.findAll()
+export const listPosts = (includeAll = false) => postRepository.findAll(includeAll)
 export const getPostById = (id) => postRepository.findById(id)
 export const approvePost = (id) => postRepository.approve(id, new Date().toISOString())
 export const rejectPost = (id) => postRepository.reject(id, new Date().toISOString())

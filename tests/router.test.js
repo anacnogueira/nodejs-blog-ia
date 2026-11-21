@@ -36,6 +36,51 @@ test('matches a route and exposes decoded path params on request', async () => {
     assert.equal(response.body, 'ok')
 })
 
+test('returns 403 for include=all without a valid API key', async () => {
+    const originalApiKey = process.env.API_KEY
+    const originalDatabaseUrl = process.env.DATABASE_URL
+    process.env.API_KEY = 'chave-valida'
+    process.env.DATABASE_URL ||= 'postgresql://postgres:postgres@localhost:5432/blog_ia'
+
+    try {
+        const router = createRouter()
+        const { registerPostRoutes } = await import('../src/routes/post-routes.js')
+        registerPostRoutes(router)
+
+        const withoutApiKey = createResponse()
+        await router.handle(
+            { method: 'GET', url: '/posts?include=all', headers: {} },
+            withoutApiKey,
+        )
+        assert.equal(withoutApiKey.statusCode, 403)
+        assert.deepEqual(JSON.parse(withoutApiKey.body), { message: 'Acesso negado' })
+
+        const withInvalidApiKey = createResponse()
+        await router.handle(
+            {
+                method: 'GET',
+                url: '/posts?include=all',
+                headers: { authorization: 'Bearer chave-invalida' },
+            },
+            withInvalidApiKey,
+        )
+        assert.equal(withInvalidApiKey.statusCode, 403)
+        assert.deepEqual(JSON.parse(withInvalidApiKey.body), { message: 'Acesso negado' })
+    } finally {
+        if (originalApiKey === undefined) {
+            delete process.env.API_KEY
+        } else {
+            process.env.API_KEY = originalApiKey
+        }
+
+        if (originalDatabaseUrl === undefined) {
+            delete process.env.DATABASE_URL
+        } else {
+            process.env.DATABASE_URL = originalDatabaseUrl
+        }
+    }
+})
+
 test('returns JSON 404 when no route matches', async () => {
     const router = createRouter()
     const response = createResponse()
