@@ -63,3 +63,21 @@ test('matches a PATCH route and exposes path params', async () => {
     assert.equal(response.statusCode, 200)
     assert.equal(response.body, 'approved')
 })
+
+test('matches a DELETE route and exposes path params', async () => {
+    const router = createRouter()
+    let receivedRequest
+
+    router.delete('/posts/:id/reject', async (request, response) => {
+        receivedRequest = request
+        response.writeHead(200)
+        response.end('rejected')
+    })
+
+    const response = createResponse()
+    await router.handle({ method: 'DELETE', url: '/posts/post-123/reject' }, response)
+
+    assert.deepEqual(receivedRequest.params, { id: 'post-123' })
+    assert.equal(response.statusCode, 200)
+    assert.equal(response.body, 'rejected')
+})

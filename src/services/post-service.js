@@ -6,6 +6,7 @@ import * as postRepository from '../repositories/post-repository.js'
 export const listPosts = () => postRepository.findAll()
 export const getPostById = (id) => postRepository.findById(id)
 export const approvePost = (id) => postRepository.approve(id, new Date().toISOString())
+export const rejectPost = (id) => postRepository.reject(id, new Date().toISOString())
 
 export async function createPost(idea) {
     const agent = mastra.getAgentById(ID)
