@@ -127,7 +127,11 @@ Ele cria `.env.local`, inicia o PostgreSQL e aplica as migrations. Em seguida, e
 |---|---|
 | `npm run dev` | Inicia em modo watch |
 | `npm start` | Inicia a aplicação normalmente |
-| `npm test` | Executa os testes |
+| `npm test` | Executa todos os testes encontrados pelo Node Test Runner |
+| `npm run test:unit` | Executa testes unitários |
+| `npm run test:integration` | Executa testes de integração |
+| `npm run test:e2e` | Executa testes E2E com Supertest |
+| `npm run test:all` | Executa unitários, integração e E2E em sequência |
 | `npm run lint` | Executa o Oxlint |
 | `npm run format` | Formata `src` e `tests` |
 | `npm run format:check` | Verifica formatação |
@@ -272,12 +276,25 @@ Respostas:
 ## Testes e qualidade
 
 ```bash
+npm run test:unit
+npm run test:integration
+npm run test:e2e
+npm run test:all
+```
+
+- Unitários: validam isoladamente o roteador HTTP.
+- Integração: validam o registro das rotas e suas respostas intermediárias.
+- E2E: usam Supertest sobre uma instância real de `node:http`.
+
+Também é possível executar a descoberta geral:
+
+```bash
 npm test
 npm run lint
 npm run format:check
 ```
 
-Os testes cobrem correspondência de rotas, parâmetros de URL, respostas 404/403 e os métodos HTTP de `posts`.
+Os testes cobrem correspondência de rotas, parâmetros de URL, respostas 404/403/400 e os métodos HTTP de `posts`.
 
 ## Build
 
@@ -410,7 +427,13 @@ src/
 ├── routes/post-routes.js    # Rotas da API
 └── services/post-service.js # Regras e geração via IA
 
-tests/router.test.js         # Testes de roteamento
+tests/
+├── unit/
+│   └── router.test.js
+├── integration/
+│   └── post-routes.test.js
+└── e2e/
+    └── posts.e2e.test.js
 ```
 
 ## Solução de problemas

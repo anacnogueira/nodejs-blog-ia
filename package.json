@@ -9,6 +9,10 @@
     "format": "oxfmt src tests",
     "format:check": "oxfmt --check src tests",
     "test": "node --test",
+    "test:unit": "node --test tests/unit/*.test.js",
+    "test:integration": "node --test tests/integration/*.test.js",
+    "test:e2e": "node --test tests/e2e/*.test.js",
+    "test:all": "npm run test:unit && npm run test:integration && npm run test:e2e",
     "dev:infra:up": "docker-compose up -d && npm run dev",
     "env:setup": "cp .env.example .env.local",
     "local:setup": "npm run env:setup && npm run infra:up && npm run migrate:up",
@@ -31,7 +35,8 @@
     "lint-staged": "^17.6.1",
     "oxfmt": "^0.79.0",
     "oxlint": "^1.94.0",
-    "postgrator-cli": "^10.0.0"
+    "postgrator-cli": "^10.0.0",
+    "supertest": "^7.3.2"
   },
   "lint-staged": {
     "*.{js,mjs,cjs}": [
