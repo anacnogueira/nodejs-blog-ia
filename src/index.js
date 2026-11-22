@@ -1,10 +1,12 @@
 import { createServer } from 'node:http'
 import { createRouter } from './http/router.js'
 import { registerPostRoutes } from './routes/post-routes.js'
+import { registerDocsRoutes } from './routes/docs-routes.js'
 
 export function createApp() {
     const router = createRouter()
     registerPostRoutes(router)
+    registerDocsRoutes(router)
     return createServer(router.handle)
 }
 

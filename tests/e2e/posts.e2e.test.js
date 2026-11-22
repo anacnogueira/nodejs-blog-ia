@@ -62,3 +62,34 @@ test('E2E: criação de rascunho rejeita JSON inválido', async () => {
             assert.deepEqual(response.body, { message: 'Dados inválidos' })
         })
 })
+
+test('E2E: página Swagger fica disponível em /api/docs', async () => {
+    await request(createAppForTest())
+        .get('/api/docs')
+        .expect('Content-Type', /html/)
+        .expect(200)
+        .then((response) => {
+            assert.match(response.text, /SwaggerUIBundle/)
+            assert.match(response.text, /\/api\/docs\/json/)
+        })
+})
+
+test('E2E: especificação OpenAPI fica disponível em /api/docs/json', async () => {
+    await request(createAppForTest())
+        .get('/api/docs/json')
+        .expect('Content-Type', /json/)
+        .expect(200)
+        .then((response) => {
+            assert.equal(response.body.openapi, '3.1.0')
+            assert.equal(response.body.info.title, 'Blog IA API')
+            assert.ok(response.body.paths['/posts'])
+            assert.ok(response.body.paths['/posts/draft'])
+        })
+})
+
+test('E2E: asset principal do Swagger UI fica disponível', async () => {
+    await request(createAppForTest())
+        .get('/api/docs/swagger-ui.css')
+        .expect('Content-Type', /css/)
+        .expect(200)
+})

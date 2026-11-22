@@ -487,3 +487,12 @@ npm run migrate:up
 ## Licença
 
 ISC
+
+## Documentação Swagger
+
+A documentação interativa fica disponível em:
+
+- Interface: `http://localhost:8080/api/docs`
+- Especificação OpenAPI 3.1: `http://localhost:8080/api/docs/json`
+
+A interface usa Swagger UI local e permite informar o Bearer token para autenticação com `API_KEY`.
